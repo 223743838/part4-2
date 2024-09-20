@@ -1,0 +1,28 @@
+version: '3'
+services:
+
+  deakin-library:
+    image: deakin-library
+    build: 
+      context: ./book_catalog
+      dockerfile: Dockerfile
+    container_name: deakin-library
+    ports:
+     - "8005:8005"
+    environment:
+      - PORT=8005
+      - DATABASE_URL=postgresql://part5_kok0_user:t3VwQ2K3okviOxATNCXQYZYO42DBLUsV@dpg-crlh7jrtq21c73efggv0-a.oregon-postgres.render.com/part5_kok0
+    restart: "no"
+
+  deakin-inventory:
+    image: deakin-inventory
+    build: 
+      context: ./inventory_management
+      dockerfile: Dockerfile
+    container_name: deakin-inventory
+    ports:
+     - "8006:8006"
+    environment:
+      - PORT=8006
+      - DATABASE_URL=postgresql://part5_kok0_user:t3VwQ2K3okviOxATNCXQYZYO42DBLUsV@dpg-crlh7jrtq21c73efggv0-a.oregon-postgres.render.com/part5_kok0
+    restart: "no"
