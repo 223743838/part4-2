@@ -26,7 +26,6 @@ jobs:
       with:
         tenant-id: ${{ secrets.ARM_TENANT_ID }}
         subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        enable-AzPSSession: true
 
     # Step 3: Set up Terraform CLI
     - name: Setup Terraform
