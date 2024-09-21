@@ -5,4 +5,4 @@ COPY ./book_catalog/requirements.txt .
 COPY ./book_catalog/app /app
 RUN pip install -r ./requirements.txt
 EXPOSE 8005
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8005"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]
