@@ -18,5 +18,5 @@ set -u # or set -o nounset
 : "$VERSION"
 : "$DATABASE_URL"
 
-envsubst < ./scripts/kubernetes/deployment.yaml | kubectl apply -f -
+envsubst < ./scripts/kubernetes/book_deploy.yaml | kubectl apply -f -
 envsubst < ./scripts/kubernetes/service.yaml | kubectl apply -f -
