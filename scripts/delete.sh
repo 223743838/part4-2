@@ -16,5 +16,5 @@ set -u # or set -o nounset
 : "$VERSION"
 : "$DATABASE_URL"
 
-envsubst < ./scripts/kubernetes/deployment.yaml | kubectl delete -f -
+envsubst < ./scripts/kubernetes/book_deploy.yaml | kubectl delete -f -
 envsubst < ./scripts/kubernetes/service.yaml | kubectl delete -f -
