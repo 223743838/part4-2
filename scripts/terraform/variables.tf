@@ -1,11 +1,11 @@
 # Sets global variables for this Terraform project.
 
 variable app_name {
-  default = "sit722part5"
+  default = "sit722part05"
 }
 
 variable resource_group_name {
-  default = "sit722part5.azurecr.io"
+  default = "sit722part05.azurecr.io"
 }
 
 variable location {
