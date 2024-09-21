@@ -3,6 +3,7 @@ FROM --platform=linux/amd64 python:3.12
 
 WORKDIR /app
 COPY ./inventory_management/requirements.txt .
-COPY ./inventory_management/app .
+COPY ./inventory_management/app /app
 RUN pip install -r ./requirements.txt
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+EXPOSE 8006
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8006"]
