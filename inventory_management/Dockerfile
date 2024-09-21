@@ -10,7 +10,7 @@ COPY ./inventory_management/requirements.txt /app/
 RUN pip install --no-cache-dir -r ./requirements.txt
 
 # Copy the src directory into the container
-COPY app /app/src
+COPY ./inventory_management/app /app/src
 
 # Expose the port the app runs on
 EXPOSE 8006

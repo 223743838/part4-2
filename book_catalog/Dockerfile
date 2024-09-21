@@ -9,7 +9,7 @@ COPY ./book_catalog/requirements.txt  /app/
 RUN pip install --no-cache-dir -r ./requirements.txt
 
 # Copy the src directory into the container
-COPY app /app/src
+COPY ./book_catalog/app /app/src
 
 # Expose the port the app runs on
 EXPOSE 8005
