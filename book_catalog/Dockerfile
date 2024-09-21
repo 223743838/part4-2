@@ -1,7 +1,7 @@
 # Your Solution
 
 # Use the official Python image from the Docker Hub
-FROM --platform=linux/amd64 python:3.9-slim
+FROM python:3.9-slim
 
 WORKDIR /app
 COPY ./book_catalog/requirements.txt .
