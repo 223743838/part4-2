@@ -1,3 +1,4 @@
+
 #
 # Creates a managed Kubernetes cluster on Azure.
 #
@@ -25,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 #
 # Attaches the container registry to the cluster.
 # See example here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry#example-usage-attaching-a-container-registry-to-a-kubernetes-cluster
-#
+
 resource "azurerm_role_assignment" "role_assignment" {
   principal_id                     = azurerm_kubernetes_cluster.cluster.kubelet_identity[0].object_id
   role_definition_name             = "AcrPull"

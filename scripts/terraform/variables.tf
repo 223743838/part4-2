@@ -4,10 +4,14 @@ variable app_name {
   default = "sit722part5"
 }
 
-variable location {
-  default = "australiasoutheast"
+variable resource_group_name {
+  default = "sit722part5.azurecr.io"
 }
 
-variable kubernetes_version { 
-  default = "1.29.7"
+variable location {
+  default = "australiaeast"
+}
+
+variable kubernetes_version {    
+  default = "1.30.3"
 }

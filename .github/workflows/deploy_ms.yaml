@@ -1,20 +1,7 @@
-# 
-# GitHub Actions workflow.
-#
-# Automatically deploys the Node.js microservice to Kubernetes on push to the main branch.
-#
 
-name: Deploy Deakin Library (book_catalog)
+name: Deploy microservice
 
 on:
-  #
-  # Deploy the microservice on push to any branch of this code repository.
-  #
-  push: 
-    branches:
-      - master
-    paths:
-      - book_catalog/**
 
   #
   # Allows deployment to be invoked manually through the GitHub Actions user interface.
@@ -31,36 +18,36 @@ jobs:
       CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
       REGISTRY_UN: ${{ secrets.REGISTRY_UN }}
       REGISTRY_PW: ${{ secrets.REGISTRY_PW  }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL  }}
-      NAME: deakin-library
-      DIRECTORY: book_catalog
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       
       # Checks-out your repository under $GITHUB_WORKSPACE.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up permissions for build script
-        run: chmod +x ./scripts/build-image.sh
-
-      - name: Set up permissions for push-image script
-        run: chmod +x ./scripts/push-image.sh
-
-      - name: Set up permissions for deploy script
-        run: chmod +x ./scripts/deploy.sh
-
+      #
+      # Give execute permissions for the build script.
+      #
+      - name: Permission Build
+        run: chmod +x scripts/build-image.sh
 
       #
       # Builds the Docker image.
       #
       - name: Build
-        run: ./scripts/build-image.sh
+        run: scripts/build-image.sh
+
+      #
+      # Give execute permissions for the build script.
+      #
+      - name: Permission Publish
+        run: chmod +x scripts/push-image.sh
 
       #
       # Publishes the Docker image to the container registry.
       #
       - name: Publish
-        run: ./scripts/push-image.sh
+        run: scripts/push-image.sh
 
       #
       # Installs Kubectl and connects it to the cluster.
@@ -73,7 +60,13 @@ jobs:
           kubectl-version: v1.24.2
       
       #
+      # Give execute permissions for the build script.
+      #
+      - name: Permission Deploy
+        run: chmod +x scripts/deploy.sh
+
+      #
       # Expands the configuration template and deploys the microservice.
       #
       - name: Deploy
-        run: ./scripts/deploy.sh
+        run: scripts/deploy.sh

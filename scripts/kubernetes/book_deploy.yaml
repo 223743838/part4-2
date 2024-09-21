@@ -1,38 +1,50 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deakin-library
-  labels:
-    app: deakin-library
+  name: book-catalog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: deakin-library
+      app: book-catalog
   template:
     metadata:
       labels:
-        app: deakin-library
+        app: book-catalog
     spec:
       containers:
-      - name: deakin-library
-        image: $CONTAINER_REGISTRY/deakin-library:$VERSION
-        imagePullPolicy: IfNotPresent 
+      - name: book-catalog
+        image: $CONTAINER_REGISTRY/book-catalog:$VERSION
+        imagePullPolicy: Always
         env:
         - name: PORT
           value: "8005"
         - name: DATABASE_URL
-          value: $DATABASE_URL
+          value: "$DATABASE_URL"
 ---
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: deakin-library
+  name: inventory-management
 spec:
+  replicas: 1
   selector:
-    app: deakin-library
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 31000
-      targetPort: 8005
+    matchLabels:
+      app: inventory-management
+  template:
+    metadata:
+      labels:
+        app: inventory-management
+    spec:
+      containers:
+      - name: inventory-management
+        image: $CONTAINER_REGISTRY/inventory-management:$VERSION
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8006
+        env:
+        - name: PORT
+          value: "8006"
+        - name: DATABASE_URL
+          value: "$DATABASE_URL"
