@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@v3
 
       # Azure login using Service Principal credentials from GitHub Secrets
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # - name: Azure Login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Set up Terraform
       - name: Set up Terraform
@@ -40,104 +40,10 @@ jobs:
         run: terraform init
         working-directory: scripts/terraform
 
-    # Step : Check if Resource Group exists and import if needed
-      - name: Check and Import Resource Group
-        working-directory: scripts/terraform
-        run: |
-          echo "Checking if Resource Group '${{ secrets.AZURE_RESOURCE_GROUP_NAME }}' exists..."
-          if az group exists --name ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}; then
-          echo "Resource Group exists. Checking if it's already imported into Terraform..."
-          if terraform state list | grep azurerm_resource_group.${{ secrets.AZURE_RESOURCE_GROUP_NAME }}; then
-            echo "Resource Group already imported into Terraform. Skipping import."
-          else
-            echo "Resource Group not found in Terraform state. Importing now..."
-            terraform import -input=false \
-              -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-              -var="acr_name=${{ secrets.AZURE_ACR_NAME }}" \
-              -var="aks_name=${{ secrets.AZURE_AKS_NAME }}" \
-              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var="location=${{ secrets.AZURE_LOCATION }}" \
-              azurerm_resource_group.${{ secrets.AZURE_RESOURCE_GROUP_NAME }} /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP_NAME }} || {
-              echo "Resource Group import failed or already imported.";
-              exit 0;
-            }
-          fi
-          else
-          echo "Resource Group does not exist. Skipping import.";
-          fi
-    # Step : Check if Azure Container Registry exists and import if needed
-      - name: Check and Import ACR
-        working-directory: scripts/terraform
-        run: |
-         echo "Checking if ACR '${{ secrets.AZURE_ACR_NAME }}' exists..."
-         if az acr show --name ${{ secrets.AZURE_ACR_NAME }}; then
-          echo "Azure Container Registry exists. Checking if it's already imported into Terraform..."
-          if terraform state list | grep azurerm_container_registry.libraryreg; then
-            echo "Azure Container Registry already imported into Terraform. Skipping import."
-          else
-            echo "Azure Container Registry not found in Terraform state. Importing now..."
-            terraform import -input=false \
-              -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-              -var="acr_name=${{ secrets.AZURE_ACR_NAME }}" \
-              -var="aks_name=${{ secrets.AZURE_AKS_NAME }}" \
-              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var="location=${{ secrets.AZURE_LOCATION }}" \
-              azurerm_container_registry.libraryreg /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP_NAME }}/providers/Microsoft.ContainerRegistry/registries/${{ secrets.AZURE_ACR_NAME }} || {
-              echo "Azure Container Registry import failed or already imported.";
-              exit 0;
-            }
-          fi
-          else
-          echo "Azure Container Registry does not exist. Skipping import.";
-           fi
-  # Step 8: Check if Kubernetes cluster exists and import if needed
-      - name: Check and Import Kubernetes Cluster
-        working-directory: scripts/terraform
-        run: |
-         echo "Checking if Kubernetes cluster '${{ secrets.AZURE_AKS_NAME }}' exists..."
-         if az aks show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} --name ${{ secrets.AZURE_AKS_NAME }}; then
-          echo "Kubernetes cluster exists. Checking if it's already imported into Terraform..."
-          if terraform state list | grep azurerm_kubernetes_cluster.${{ secrets.AZURE_AKS_NAME }}; then
-            echo "Kubernetes cluster already imported into Terraform. Skipping import."
-          else
-            echo "Kubernetes cluster not found in Terraform state. Importing now..."
-            terraform import -input=false \
-              -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-              -var="acr_name=${{ secrets.AZURE_ACR_NAME }}" \
-              -var="aks_name=${{ secrets.AZURE_AKS_NAME }}" \
-              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var="location=${{ secrets.AZURE_LOCATION }}" \
-              azurerm_kubernetes_cluster.${{ secrets.AZURE_AKS_NAME }} /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.AZURE_RESOURCE_GROUP_NAME }}/providers/Microsoft.ContainerService/managedClusters/${{ secrets.AZURE_AKS_NAME }} || {
-              echo "Kubernetes cluster import failed or already imported.";
-              exit 0;
-            }
-          fi
-         else
-          echo "Kubernetes cluster does not exist. Skipping import.";
-         fi
-           
-      # Run Terraform plan
       - name: Terraform Plan
+        run: terraform plan -var="app_name=${{ secrets.APP_NAME }}" -var="kubernetes_version=${{ secrets.KUBERNETES_VERSION }}" -var="subscription_id=${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}" -var="client_id=${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}" -var="client_secret=${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}" -var="tenant_id=${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}"
         working-directory: scripts/terraform
-        run: |
-         terraform plan \
-          -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-          -var="acr_name=${{ secrets.AZURE_ACR_NAME }}" \
-          -var="aks_name=${{ secrets.AZURE_AKS_NAME }}" \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="location=${{ secrets.AZURE_LOCATION }}"
 
-      # Optionally, apply Terraform changes (use cautiously in production!)
       - name: Terraform Apply
+        run: terraform apply -auto-approve -var="app_name=${{ secrets.APP_NAME }}" -var="kubernetes_version=${{ secrets.KUBERNETES_VERSION }}" -var="subscription_id=${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}" -var="client_id=${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}" -var="client_secret=${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}" -var="tenant_id=${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}"
         working-directory: scripts/terraform
-        run: |
-         terraform apply -auto-approve \
-          -var="resource_group_name=${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-          -var="acr_name=${{ secrets.AZURE_ACR_NAME }}" \
-          -var="aks_name=${{ secrets.AZURE_AKS_NAME }}" \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="location=${{ secrets.AZURE_LOCATION }}"
-
-        # Step : Log in to Azure Container Registry
-      - name: Log in to ACR
-        run: az acr login --name ${{ secrets.AZURE_ACR_NAME }}

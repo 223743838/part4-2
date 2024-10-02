@@ -49,24 +49,13 @@ jobs:
       - name: Publish
         run: scripts/push-image.sh
 
-      # Step 15: Set up kubectl for Kubernetes
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
-        with:
-          version: 'v1.20.0'
-
-    # Step 16: Get AKS credentials using Service Principal
-      - name: Get AKS credentials
-        run: az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} --name ${{ secrets.AZURE_AKS_NAME }}
-
-      #
-      # Give execute permissions for the build script.
-      #
       - name: Permission Deploy
         run: chmod +x scripts/deploy.sh
 
-      #
-      # Expands the configuration template and deploys the microservice.
-      #
-      - name: Deploy
+      - uses: tale/kubectl-action@v1
+        with:
+          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
+          kubectl-version: v1.24.2
+
+      - name: Deploy to Kubernetes
         run: scripts/deploy.sh
