@@ -1,17 +1,19 @@
-# Sets global variables for this Terraform project.
-
-variable app_name {
-  default = "sit722part05"
+variable "location" {
+  description = "Azure location for the resources"
 }
 
-variable resource_group_name {
-  default = "sit722part05.azurecr.io"
+variable "resource_group_name" {
+  description = "Name of the resource group"
 }
 
-variable location {
-  default = "australiaeast"
+variable "acr_name" {
+  description = "Azure Container Registry name"
 }
 
-variable kubernetes_version {    
-  default = "1.30.3"
+variable "aks_name" {
+  description = "Azure Kubernetes Cluster name"
+}
+
+variable "subscription_id" {
+  description = "Azure subscription ID"
 }
