@@ -21,6 +21,7 @@ variable "tenant_id" {
 
 # Sets global variables for this Terraform projectt.
 variable "app_name" {
+  default     = "sit722part05"
   description = "The name of the application"
 }
 
